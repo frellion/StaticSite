@@ -34,6 +34,16 @@ class ParentNode(HTMLNode):
 		if self.children == None or self.children == "":
 			raise ValueError("ParentNode requires children")
 
+		for child in self.children:
+			if self.props==None or self.props=="":
+				open_tag = f"<{self.tag}>"
+			else:
+				open_tag = f"<{self.tag}{self.props_to_html()}>"
+
+			close_tag = f"</{self.tag}>"
+			return open_tag+child.to_html()+close_tag
+
+"""
 		for x in range(0, len(self.children)-1):
 			#open and close tags
 			if self.props==None or self.props=="":
@@ -45,6 +55,7 @@ class ParentNode(HTMLNode):
 
 			#recursive step <yay -_-*>
 			return open_tag+children[x].to_html()+closing_tag
+"""
 
 
 class LeafNode(HTMLNode):

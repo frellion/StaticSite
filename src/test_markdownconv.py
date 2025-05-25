@@ -194,7 +194,61 @@ This is the same paragraph on a new line
 #		print(blocks_with_empty_blocks)
 
 
+class Test_block_to_html(unittest.TestCase):
+	def test_codeblock(self):
+		md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+		node = markdown_to_html_node(md)
+		html = node.to_html()
+		assertEqual(
+			html,
+			"<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+		)
+
+
+	def test_paragraph(self):
+		md = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+
+		node = markdown_to_html_node(md)
+		html = node.to_html()
+		assertEqual(
+			html,
+			"<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+		)
+
+
+	def test_blockquotes(self):
+		md = """
+> Let us create a fake quote
+> with some fake _emphasis_
+> and see what happens.
+"""
+		node = markdown_to_html_node(md)
+		html = node.to_html()
+		assertEqual(
+			html,
+			"<div><blockquote>Let us create a fake quote\nwith some fake _emphasis_\nand see what happens.<blockquote></blockquote></div>"
+		)
+
+
 def assertListEqual(list1, list2):
 	if list1==list2:
+		return True
+	return False
+
+def assertEqual(string1, string2):
+	if string1==string2:
 		return True
 	return False

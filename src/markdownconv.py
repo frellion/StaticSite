@@ -1,5 +1,7 @@
 import re
 from textnode import *
+from blockproc import *
+from htmlnode import *
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
 	new_nodes = []
@@ -11,6 +13,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 		else:
 			split_node = node.text.split(delimiter)
 			#see big block o' logic below
+#			print(f"split node is {split_node}")
 			fragment_count = len(split_node)
 			if split_node[0]=="" and split_node[-1]=="":
 				#there are 2 extra empty strings to ignore. There should be odd fragments
@@ -134,6 +137,166 @@ def markdown_to_blocks(markdown):
 			blocks.append(raw_block.strip())
 	return blocks
 
+
+def markdown_to_html_node(markdown):
+	blocks = markdown_to_blocks(markdown)
+	html_node_list = []
+	string = ""
+	for block in blocks:
+		type = block_to_block_type(block)
+#		print(type)
+#		print(f"block is {block}")
+		if type == BlockType.code:
+			node_list = []
+			node = LeafNode(block.strip("```"), "code")
+			node_list.append(node)
+#			html_node_list.append(ParentNode("pre", node_list))
+			string += ParentNode("pre", node_list).to_html()
+		if type == BlockType.paragraph:
+			string += LeafNode(markdown_to_html(block), "p").to_html()
+		if type == BlockType.quote:
+			block = strip_blockquote_md(block)
+			string += LeafNode(markdown_to_html(block), "blockquote").to_html()
+		if type == BlockType.heading:
+			block, tag = strip_heading_md(block)
+			string += LeafNode(markdown_to_html(block), tag).to_html()
+		if type == BlockType.unordered_list:
+			list = strip_ul_markdown(block) #returns a <li>...</li>string
+			node_list = []
+#			node = LeafNode(list, None)
+#			print(f"node is {node}")
+			node_list.append(LeafNode(list, None))
+			string += ParentNode("ul", node_list).to_html()
+		if type == BlockType.ordered_list:
+			list = strip_ol_markdown(block) #returns a <li>...</li>string
+			node_list = []
+#			node = LeafNode(list, None)
+#			print(f"node is {node}")
+			node_list.append(LeafNode(list, None))
+			string += ParentNode("ol", node_list).to_html()
+
+
+	html_node_list.append(LeafNode(string, None))
+	return ParentNode("div", html_node_list)
+
+def markdown_to_html(text):
+	textNodes = text_to_textnodes(text)
+#	node_list = []
+	string = ""
+	for textNode in textNodes:
+#		node_list.append(text_node_to_html_node(textNode))
+		string += text_node_to_html_node(textNode).to_html()
+#	print(f"string is {string}")
+#	return node_list
+	return string
+
+#def strip_extra_tags(nodeList):
+#	for node in nodeList:
+#		node.value = node.value.replace("<>", "")
+#		node.value = node.value.replace("</>", "")
+#	return nodeList
+
+def strip_blockquote_md(block):
+	return block.replace("> ", "")
+
+def strip_heading_md(block):
+	if block[0:2]=="# ":
+		tag = "h1"
+		return block.replace("# ",""), tag
+	if block[0:3]=="## ":
+		tag = "h2"
+		return block.replace("## ",""), tag
+	if block[0:4]=="### ":
+		tag = "h3"
+		return block.replace("### ",""), tag
+	if block[0:5]=="#### ":
+		tag = "h4"
+		return block.replace("#### ",""), tag
+	if block[0:6]=="##### ":
+		tag = "h5"
+		return block.replace("##### ",""), tag
+	if block[0:7]=="###### ":
+		tag = "h6"
+		return block.replace("###### ",""), tag
+
+
+def strip_ul_markdown(block):
+	list_items = block.split("\n")
+	string = ""
+	for item in list_items:
+		temp = item.replace("- ","")
+		string+="<li>"+temp+"</li>\n"
+	return string
+
+
+def strip_ol_markdown(block):
+	list_items = block.split("\n")
+	string = ""
+#	print(f"items inside function is {list_items}")
+	for item in range(0,len(list_items)):
+		temp = list_items[item].replace(f"{item+1}. ","")
+#		print(f"temp is {temp}")
+		string+="<li>"+temp+"</li>\n"
+	return string
+
+
+def main():
+	md1 = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+
+	md2 = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+	md3 = """
+> Let us create a fake quote
+> with some fake _emphasis_
+> and see what happens.
+"""
+
+	md4 = """
+# heading 1
+
+## heading 2
+
+### heading 3
+
+#### heading 4
+
+##### heading 5
+
+###### heading 6 
+"""
+
+	md6 = """
+- item
+- another item
+- yet another item
+"""
+
+	md7 = """
+1. first
+2. second
+3. third
+"""
+
+#	print(markdown_to_html_node(md1).to_html())
+#	print(markdown_to_html_node(md2).to_html())
+#	print(markdown_to_html_node(md3).to_html())
+#	print(markdown_to_html_node(md4).to_html())
+	print(markdown_to_html_node(md6).to_html())
+	print(markdown_to_html_node(md7).to_html())
+
+#main()
 
 """
 def main():
