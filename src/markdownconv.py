@@ -86,9 +86,8 @@ def split_nodes_image(old_nodes):
 					new_nodes.append(TextNode(text_pieces[1], TextType.TEXT))
 #				if len(text_pieces)>1:
 #					split_nodes_image([TextNode(text_pieces[1], TextType.TEXT)])
-				
-					
-
+									
+#	print(f"image_nodes is {new_nodes}")
 	return new_nodes
 
 
@@ -165,14 +164,16 @@ def markdown_to_html_node(markdown):
 			node_list = []
 #			node = LeafNode(list, None)
 #			print(f"node is {node}")
-			node_list.append(LeafNode(list, None))
+#			node_list.append(LeafNode(list, None))
+			node_list.append(LeafNode(markdown_to_html(list), None))
 			string += ParentNode("ul", node_list).to_html()
 		if type == BlockType.ordered_list:
 			list = strip_ol_markdown(block) #returns a <li>...</li>string
 			node_list = []
 #			node = LeafNode(list, None)
 #			print(f"node is {node}")
-			node_list.append(LeafNode(list, None))
+#			node_list.append(LeafNode(list, None))
+			node_list.append(LeafNode(markdown_to_html(list), None))
 			string += ParentNode("ol", node_list).to_html()
 
 
@@ -197,7 +198,10 @@ def markdown_to_html(text):
 #	return nodeList
 
 def strip_blockquote_md(block):
-	return block.replace("> ", "")
+	block = block.replace(">\n", "\n")
+	block = block.replace("> ", "")
+#	return block.replace("> ", "")
+	return block
 
 def strip_heading_md(block):
 	if block[0:2]=="# ":
@@ -238,6 +242,17 @@ def strip_ol_markdown(block):
 #		print(f"temp is {temp}")
 		string+="<li>"+temp+"</li>\n"
 	return string
+
+
+
+def extract_title(md):
+	blocks = markdown_to_blocks(md)
+	for block in blocks:
+		type = block_to_block_type(block)
+		if type == BlockType.heading:
+			block, tag = strip_heading_md(block)
+			if tag == "h1":
+				return block.strip()
 
 
 def main():
@@ -293,8 +308,8 @@ the **same** even with inline stuff
 #	print(markdown_to_html_node(md2).to_html())
 #	print(markdown_to_html_node(md3).to_html())
 #	print(markdown_to_html_node(md4).to_html())
-	print(markdown_to_html_node(md6).to_html())
-	print(markdown_to_html_node(md7).to_html())
+#	print(markdown_to_html_node(md6).to_html())
+#	print(markdown_to_html_node(md7).to_html())
 
 #main()
 

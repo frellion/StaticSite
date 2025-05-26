@@ -243,6 +243,47 @@ This is another paragraph with _italic_ text and `code` here
 		)
 
 
+class Test_extract_title(unittest.TestCase):
+	def test_plain_header(self):
+		md = """
+* This is our glorious title
+
+Then we have paragraphs for days.
+
+Probably.
+
+Eventually.
+
+Then maybe a list to boot:
+- one
+- two
+- three relevant points
+"""
+		title = extract_title(md)
+		assertEqual(title, "This is our glorious title")
+
+
+	def test_messy_header(self):
+		md = """
+_Behold, fake metadata_
+
+*    This is our glorious title     
+
+Then we have paragraphs for days.
+
+Probably.
+
+Eventually.
+
+Then maybe a list to boot:
+- one
+- two
+- three relevant points
+"""
+		title = extract_title(md)
+		assertEqual(title, "This is our glorious title")
+
+
 def assertListEqual(list1, list2):
 	if list1==list2:
 		return True
