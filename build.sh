@@ -1,1 +1,1 @@
-python3 src/main.py "https://github.com/frellion/StaticSite/"
+python3 src/main.py "https://github.com/frellion/StaticSite/docs"
