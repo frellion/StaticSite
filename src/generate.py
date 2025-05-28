@@ -5,7 +5,9 @@ from markdownconv import *
 
 def set_up_public():
 	source = "/mnt/c/Users/frellion/Projects/staticsite/StaticSite/static"
-	dest = "/mnt/c/Users/frellion/Projects/staticsite/StaticSite/public"
+#	dest = "/mnt/c/Users/frellion/Projects/staticsite/StaticSite/public"
+	dest = "/mnt/c/Users/frellion/Projects/staticsite/StaticSite/docs"
+
 
 	delete_files(dest)
 	copy_files(source, dest)
@@ -42,7 +44,8 @@ def copy_files(source, destination):
 
 
 
-def generate_page(from_path, template_path, dest_path):
+#def generate_page(from_path, template_path, dest_path):
+def generate_page(basepath, from_path, template_path, dest_path):
 	print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 	if os.path.exists(from_path) and os.path.isfile(from_path):
 		source = open(from_path)
@@ -65,6 +68,8 @@ def generate_page(from_path, template_path, dest_path):
 
 	template = template.replace("{{ Title }}", title)
 	template = template.replace("{{ Content }}", html)
+	template = template.replace("href=\"/", f"href=\"{basepath}")
+	template = template.replace("src=\"/", f"src=\"{basepath}")
 
 	if os.path.exists(os.path.dirname(dest_path)):
 		print(f"dest_path: {dest_path}")
@@ -79,7 +84,8 @@ def generate_page(from_path, template_path, dest_path):
 
 
 
-def generate_pages_recursively(dir_path_content, template_path, dest_dir_path):
+#def generate_pages_recursively(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursively(basepath, dir_path_content, template_path, dest_dir_path):
 #	#template file
 #	if os.path.exists(template_path) and os.path.isfile(template_path):
 #		source = open(template_path)
@@ -102,7 +108,8 @@ def generate_pages_recursively(dir_path_content, template_path, dest_dir_path):
 					dest_file_name = dest_dir_path+"/index.html"
 #				generate_page(item_source_path, template_path, dest_dir_path)
 #				generate_page(item_source_path, template_path, item_dest_path)
-				generate_page(item_source_path, template_path, dest_file_name)
+#				generate_page(item_source_path, template_path, dest_file_name)
+				generate_page(basepath, item_source_path, template_path, dest_file_name)
 
 #				#load in and process each; copy into destination folder
 #
@@ -117,5 +124,6 @@ def generate_pages_recursively(dir_path_content, template_path, dest_dir_path):
 				print(f"from folder {item_source_path}")
 				print(f"to folder {item_dest_path}")
 				os.mkdir(item_dest_path)
-				generate_pages_recursively(item_source_path, template_path, item_dest_path)
+#				generate_pages_recursively(item_source_path, template_path, item_dest_path)
+				generate_pages_recursively(basepath, item_source_path, template_path, item_dest_path)
 
