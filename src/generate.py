@@ -17,7 +17,7 @@ def delete_files(location):
 		for item in list:
 			item_path = os.path.join(location, item)
 			if os.path.isfile(item_path):
-				#print(f"deleting {item_path}")
+#				print(f"deleting {item_path}")
 				os.remove(item_path)
 			else:
 				delete_files(item_path)
@@ -31,12 +31,12 @@ def copy_files(source, destination):
 			item_source_path = os.path.join(source, item)
 			item_dest_path = os.path.join(destination, item)
 			if os.path.isfile(item_source_path):
-				#print(f"from {item_source_path}")
-				#print(f"to {item_dest_path}")
+#				print(f"from {item_source_path}")
+#				print(f"to {item_dest_path}")
 				shutil.copy(item_source_path, item_dest_path)
 			else:
-				#print(f"from folder {item_source_path}")
-				#print(f"to folder {item_dest_path}")
+				print(f"from folder {item_source_path}")
+				print(f"to folder {item_dest_path}")
 				os.mkdir(item_dest_path)
 				copy_files(item_source_path, item_dest_path)
 
@@ -67,9 +67,55 @@ def generate_page(from_path, template_path, dest_path):
 	template = template.replace("{{ Content }}", html)
 
 	if os.path.exists(os.path.dirname(dest_path)):
+		print(f"dest_path: {dest_path}")
+#		file_name = dest_path+".html"
 		with open(dest_path, "w") as output:
 			output.write(template)
 	else:
-		os.makedirs(os_path.dirname(dest_path))
+		os.makedirs(os.path.dirname(dest_path))
+#		file_name = dest_path+".html"
 		with open(dest_path, "w") as output:
 			output.write(template)
+
+
+
+def generate_pages_recursively(dir_path_content, template_path, dest_dir_path):
+#	#template file
+#	if os.path.exists(template_path) and os.path.isfile(template_path):
+#		source = open(template_path)
+#		template = source.read()
+#		source.close()
+
+	#source list
+	if os.path.exists(dir_path_content) and os.path.isdir(dir_path_content):
+		source_list = os.listdir(dir_path_content)
+
+
+		for source in source_list:
+			item_source_path = os.path.join(dir_path_content, source)
+			item_dest_path = os.path.join(dest_dir_path, source)
+			if os.path.isfile(item_source_path):
+				if os.path.isdir(item_dest_path):
+					dest_file_name = dest_dir_path+"index.html"
+				else:
+					#dest_file_name = dest_dir_path+".html"
+					dest_file_name = dest_dir_path+"/index.html"
+#				generate_page(item_source_path, template_path, dest_dir_path)
+#				generate_page(item_source_path, template_path, item_dest_path)
+				generate_page(item_source_path, template_path, dest_file_name)
+
+#				#load in and process each; copy into destination folder
+#
+#				#read markdown
+#				source_file = open(item_source_path)
+#				markdown = source_file.read()
+#				source_file.close()
+
+			else:
+				#item_source_path is a directory. Create destination directory and
+				#call this whole thing recursively
+				print(f"from folder {item_source_path}")
+				print(f"to folder {item_dest_path}")
+				os.mkdir(item_dest_path)
+				generate_pages_recursively(item_source_path, template_path, item_dest_path)
+
